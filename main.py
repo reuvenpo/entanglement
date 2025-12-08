@@ -37,7 +37,7 @@ def run_visibility(path):
     p.plot("alpha=45", corr.beta, corr.alpha_45, style="o")
     p.plot("alpha=90", corr.beta, corr.alpha_90, style="o")
     p.plot("alpha=135", corr.beta, corr.alpha_135, style="o")
-    fit_beta= np.linspace(corr.beta.min(), corr.beta.max())
+    fit_beta = np.linspace(corr.beta.min(), corr.beta.max())
     p.plot("fit alpha=0", fit_beta, visibility.fit(fit_beta, *alpha_0_fit_params), style="-")
     p.plot("fit alpha=45", fit_beta, visibility.fit(fit_beta, *alpha_45_fit_params), style="-")
     p.plot("fit alpha=90", fit_beta, visibility.fit(fit_beta, *alpha_90_fit_params), style="-")
