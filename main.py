@@ -5,6 +5,10 @@ import matplotlib.pyplot as plt
 from entanglement import visibility, parse, plot
 
 
+def nsigma(x1, x1_err, x2, x2_err):
+    return np.abs(x1 - x2)/(x1_err**2 + x2_err**2)**(1/2)
+
+
 def run_visibility():
     corr = parse.Correlation.from_file(
         "./data/exp-1/correlation/corr_meas_01 - waveplate white part toward source - integ time 3.6s.txt"
@@ -51,7 +55,7 @@ def run_visibility():
             f"X={indx*45}°:\t"
             f"fit: {v:.1%}, fit rel err: {v_fit_rel_err:.1%} "
             f"estimate: {v_estimates[indx]:.1%}, estimate rel err:{v_estimate_rel_err:.1%}, "
-            f"n_sigma: {np.abs(v - v_estimate)/(v_err**2 + v_estimate_err**2)**(1/2):.2}"
+            f"n_sigma: {nsigma(v, v_err, v_estimate, v_estimate_err):.2}"
         )
 
 
