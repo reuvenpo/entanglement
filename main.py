@@ -41,6 +41,7 @@ def run_visibility():
     p.plot("fit X=45", fit_x, visibility.fit(fit_x, *x_45_fit_params), style="-")
     p.plot("fit X=90", fit_x, visibility.fit(fit_x, *x_90_fit_params), style="-")
     p.plot("fit X=135", fit_x, visibility.fit(fit_x, *x_135_fit_params), style="-")
+    p.ax.set_xticks(np.linspace(0, np.pi, 5), ["0", "π/4", "π/2", "3π/4", "π"])
     p.save("output/correlation.png")
 
     print("The visibility at different X angles")
