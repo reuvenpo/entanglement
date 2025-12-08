@@ -55,8 +55,8 @@ def run_visibility(path):
         v_estimate_rel_err = v_estimate_err/v_estimate
         print(
             f"X={indx*45}°:\t"
-            f"fit: {v:.1%}, fit rel err: {v_fit_rel_err:.1%} "
-            f"estimate: {v_estimates[indx]:.1%}, estimate rel err:{v_estimate_rel_err:.1%}, "
+            f"fit: {v:.2%} ± {v_err:.2%} ({v_fit_rel_err:.2%}), "
+            f"estimate: {v_estimate:.2%} ± {v_estimate_err:.2%} ({v_estimate_rel_err:.1%}), "
             f"n_sigma: {nsigma(v, v_err, v_estimate, v_estimate_err):.2}"
         )
     print()
