@@ -9,7 +9,7 @@ from .typing import NDFloat64Array, NDStrArray
 class Correlation:
     """Parses `corr_meas` files from quCR"""
     y: NDFloat64Array
-    """Polarizer Y angle [deg]"""
+    """Polarizer Y angle [rad]"""
     x_0: NDFloat64Array
     """Coincidence counts for polarizer X at 0°"""
     x_45: NDFloat64Array
@@ -22,7 +22,7 @@ class Correlation:
     @classmethod
     def from_file(cls, path: str) -> "Correlation":
         df = np.genfromtxt(path, skip_header=4, dtype=np.float64).transpose()
-        y = df[0]
+        y = df[0] * np.pi / 180
         x_0 = df[1]
         x_45 = df[2]
         x_90 = df[3]
