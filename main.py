@@ -23,12 +23,12 @@ def run_visibility(path):
         v_estimates.append(v_estimate)
         v_estimate_errs.append(v_estimate_err)
 
-    x_0_fit_params, x_0_fit_errs = visibility.find_with_least_squares(corr.beta, corr.alpha_0)
-    x_45_fit_params, x_45_fit_errs = visibility.find_with_least_squares(corr.beta, corr.alpha_45)
-    x_90_fit_params, x_90_fit_errs = visibility.find_with_least_squares(corr.beta, corr.alpha_90)
-    x_135_fit_params, x_135_fit_errs = visibility.find_with_least_squares(corr.beta, corr.alpha_135)
-    fit_params = [x_0_fit_params, x_45_fit_params, x_90_fit_params, x_135_fit_params]
-    fit_errs = [x_0_fit_errs, x_45_fit_errs, x_90_fit_errs, x_135_fit_errs]
+    alpha_0_fit_params, alpha_0_fit_errs = visibility.find_with_least_squares(corr.beta, corr.alpha_0)
+    alpha_45_fit_params, alpha_45_fit_errs = visibility.find_with_least_squares(corr.beta, corr.alpha_45)
+    alpha_90_fit_params, alpha_90_fit_errs = visibility.find_with_least_squares(corr.beta, corr.alpha_90)
+    alpha_135_fit_params, alpha_135_fit_errs = visibility.find_with_least_squares(corr.beta, corr.alpha_135)
+    fit_params = [alpha_0_fit_params, alpha_45_fit_params, alpha_90_fit_params, alpha_135_fit_params]
+    fit_errs = [alpha_0_fit_errs, alpha_45_fit_errs, alpha_90_fit_errs, alpha_135_fit_errs]
 
     p = plot.Plot(
         file_name, "Polarizer 2 angle (beta) [deg]", "Coincidence count"
@@ -38,10 +38,10 @@ def run_visibility(path):
     p.plot("alpha=90", corr.beta, corr.alpha_90, style="o")
     p.plot("alpha=135", corr.beta, corr.alpha_135, style="o")
     fit_beta= np.linspace(corr.beta.min(), corr.beta.max())
-    p.plot("fit alpha=0", fit_beta, visibility.fit(fit_beta, *x_0_fit_params), style="-")
-    p.plot("fit alpha=45", fit_beta, visibility.fit(fit_beta, *x_45_fit_params), style="-")
-    p.plot("fit alpha=90", fit_beta, visibility.fit(fit_beta, *x_90_fit_params), style="-")
-    p.plot("fit alpha=135", fit_beta, visibility.fit(fit_beta, *x_135_fit_params), style="-")
+    p.plot("fit alpha=0", fit_beta, visibility.fit(fit_beta, *alpha_0_fit_params), style="-")
+    p.plot("fit alpha=45", fit_beta, visibility.fit(fit_beta, *alpha_45_fit_params), style="-")
+    p.plot("fit alpha=90", fit_beta, visibility.fit(fit_beta, *alpha_90_fit_params), style="-")
+    p.plot("fit alpha=135", fit_beta, visibility.fit(fit_beta, *alpha_135_fit_params), style="-")
     p.ax.set_xticks(np.linspace(0, np.pi, 5), ["0", "π/4", "π/2", "3π/4", "π"])
     p.save(f"output/correlation - {file_name}.png")
 
