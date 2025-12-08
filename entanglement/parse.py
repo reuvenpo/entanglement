@@ -8,15 +8,15 @@ from .typing import NDFloat64Array, NDStrArray
 @dataclass
 class Correlation:
     """Parses `corr_meas` files from quCR"""
-    y: NDFloat64Array
+    beta: NDFloat64Array
     """Polarizer Y angle [rad]"""
-    x_0: NDFloat64Array
+    alpha_0: NDFloat64Array
     """Coincidence counts for polarizer X at 0°"""
-    x_45: NDFloat64Array
+    alpha_45: NDFloat64Array
     """Coincidence counts for polarizer X at 45°"""
-    x_90: NDFloat64Array
+    alpha_90: NDFloat64Array
     """Coincidence counts for polarizer X at 90°"""
-    x_135: NDFloat64Array
+    alpha_135: NDFloat64Array
     """Coincidence counts for polarizer X at 135°"""
 
     @classmethod
