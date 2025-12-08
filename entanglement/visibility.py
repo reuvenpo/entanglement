@@ -38,6 +38,7 @@ def find_with_estimate(coincidence: NDFloat64Array):
     return estimate(coincidence.min(), coincidence.max()), estimate_err(coincidence.min(), coincidence.max())
 
 
+# TODO: find an estimate of the error in this method
 def find_with_least_squares(beta, coincidence):
     res = sp.optimize.least_squares(
         lambda x: coincidence - fit(beta, x[0], x[1], x[2], x[3]),
