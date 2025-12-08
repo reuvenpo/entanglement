@@ -11,17 +11,19 @@ def run_visibility():
     )
     # print(corr)
 
-    x_estimates = []
-    x_estimate_errs = []
+    v_estimates = []
+    v_estimate_errs = []
     for x in [corr.x_0, corr.x_45, corr.x_90, corr.x_135]:
-        x_estimate, x_estimate_err = visibility.find_with_estimate(x)
-        x_estimates.append(x_estimate)
-        x_estimate_errs.append(x_estimate_err)
+        v_estimate, v_estimate_err = visibility.find_with_estimate(x)
+        v_estimates.append(v_estimate)
+        v_estimate_errs.append(v_estimate_err)
 
-    x_0_fit_params = visibility.find_with_least_squares(corr.y, corr.x_0)
-    x_45_fit_params = visibility.find_with_least_squares(corr.y, corr.x_45)
-    x_90_fit_params = visibility.find_with_least_squares(corr.y, corr.x_90)
-    x_135_fit_params = visibility.find_with_least_squares(corr.y, corr.x_135)
+    x_0_fit_params, x_0_fit_errs = visibility.find_with_least_squares(corr.y, corr.x_0)
+    x_45_fit_params, x_45_fit_errs = visibility.find_with_least_squares(corr.y, corr.x_45)
+    x_90_fit_params, x_90_fit_errs = visibility.find_with_least_squares(corr.y, corr.x_90)
+    x_135_fit_params, x_135_fit_errs = visibility.find_with_least_squares(corr.y, corr.x_135)
+    fit_params = [x_0_fit_params, x_45_fit_params, x_90_fit_params, x_135_fit_params]
+    fit_errs = [x_0_fit_errs, x_45_fit_errs, x_90_fit_errs, x_135_fit_errs]
 
     p = plot.Plot(
         "Coincidences over 3.6s integration time", "Polarizer 2 angle [deg]", "Coincidence count"
@@ -38,14 +40,18 @@ def run_visibility():
     p.save("output/correlation.png")
 
     print("The visibility at different X angles")
-    for indx, params in enumerate([x_0_fit_params, x_45_fit_params, x_90_fit_params, x_135_fit_params]):
-        a, beta_c, v, p = params
-        x_estimate_rel_err = x_estimate_errs[indx]/x_estimates[indx]
+    for indx in range(4):
+        a, beta_c, v, p = fit_params[indx]
+        a_err, beta_c_err, v_err, p_err = fit_errs[indx]
+        v_fit_rel_err = v_err/v
+        v_estimate = v_estimates[indx]
+        v_estimate_err = v_estimate_errs[indx]
+        v_estimate_rel_err = v_estimate_err/v_estimate
         print(
             f"X={indx*45}°:\t"
-            f"fit: {v:.1%},\t"
-            f"estimate: {x_estimates[indx]:.1%},\testimate err:{x_estimate_rel_err:.1%},\t"
-            f"n_sigma: {np.abs(v-x_estimates[indx])/x_estimate_errs[indx]:.2}"
+            f"fit: {v:.1%}, fit rel err: {v_fit_rel_err:.1%} "
+            f"estimate: {v_estimates[indx]:.1%}, estimate rel err:{v_estimate_rel_err:.1%}, "
+            f"n_sigma: {np.abs(v - v_estimate)/(v_err**2 + v_estimate_err**2)**(1/2):.2}"
         )
 
 
