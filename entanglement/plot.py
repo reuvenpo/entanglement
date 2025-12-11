@@ -22,6 +22,10 @@ class Plot:
         """A little helper to remind me I can add legend labels."""
         self.ax.plot(x, y, style, label=label)
 
+    def plot_err(self, label, x, y, sigma, style="o"):
+        """A little helper to remind me I can add legend labels."""
+        self.ax.errorbar(x, y, sigma, marker=style, linestyle="", label=label)
+
     def plot_polyfit(self, label, x, y, degree=1, style="--"):
         """Add a polynomial fit to the graph"""
         fit = npp.Polynomial.fit(x, y, deg=degree)
@@ -33,7 +37,7 @@ class Plot:
     def plot_err_with_fit(self, label, x, y, sigma, fit, style="--"):
         fit_x = np.linspace(x.min(), x.max())
         fit_y = fit(fit_x)
-        self.ax.errorbar(x=x, y=y, yerr=sigma, marker='o', linestyle='None')
+        self.ax.errorbar(x=x, y=y, yerr=sigma, marker='o', linestyle='')
         self.ax.plot(fit_x, fit_y, style, label=label)
 
     def save(self, output_file):
