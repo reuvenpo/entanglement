@@ -3,3 +3,4 @@ from . import plot
 from . import typing
 from . import correlation
 from . import statistics
+from . import michelson

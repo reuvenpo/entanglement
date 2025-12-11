@@ -58,3 +58,20 @@ class Visibility:
         randoms = df[4]
 
         return cls(measurement, single_1, single_2, coincidences, randoms)
+
+
+@dataclass
+class Counts:
+    """Parses `quCNT` files from quCR"""
+    time: NDFloat64Array
+    """Time in seconds"""
+    count: NDFloat64Array
+    """Single count rate"""
+
+    @classmethod
+    def from_file(cls, path: str) -> "Counts":
+        df = np.genfromtxt(path, dtype=np.float64).transpose()
+        time = df[0]
+        counts = df[1]
+
+        return cls(time, counts)

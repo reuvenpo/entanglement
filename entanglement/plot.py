@@ -22,9 +22,9 @@ class Plot:
         """A little helper to remind me I can add legend labels."""
         self.ax.plot(x, y, style, label=label)
 
-    def plot_err(self, label, x, y, sigma, style="o"):
+    def plot_err(self, label, x, y, sigma, style="o", linestyle=""):
         """A little helper to remind me I can add legend labels."""
-        self.ax.errorbar(x, y, sigma, marker=style, linestyle="", label=label)
+        self.ax.errorbar(x, y, sigma, marker=style, linestyle=linestyle, label=label)
 
     def plot_polyfit(self, label, x, y, degree=1, style="--"):
         """Add a polynomial fit to the graph"""
