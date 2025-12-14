@@ -1,5 +1,4 @@
 """This file includes function used in the visibility experiment"""
-from enum import IntEnum
 import os.path
 
 import numpy as np
@@ -9,19 +8,7 @@ from .typing import NDFloat64Array
 from . import parse
 from . import plot
 from . import statistics
-
-
-class Sign(IntEnum):
-    Minus = -1
-    Plus = 1
-
-
-def phi_name(sign: Sign):
-    if sign is Sign.Minus:
-        return "Φ-"
-    if sign is Sign.Plus:
-        return "Φ+"
-    return "?"
+from .util import Sign, phi_name
 
 
 def visibility_estimate(c_min, c_max):

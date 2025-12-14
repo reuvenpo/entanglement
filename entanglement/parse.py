@@ -75,3 +75,62 @@ class Counts:
         counts = df[1]
 
         return cls(time, counts)
+
+
+@dataclass
+class CHSHCount:
+    rate_1: float
+    rate_2: float
+    coincidences: int
+    corrected: int
+
+    # This property exists so we can easily switch between `coincidences` and `corrected` in testing
+    @property
+    def c(self):
+        return self.corrected
+
+
+CHSHCounts = dict[tuple[float, float], CHSHCount]
+
+
+@dataclass
+class CHSH:
+    counts: CHSHCounts
+
+    @classmethod
+    def from_file(cls, path: str):
+        # collect all the data from the file:
+        data: list[dict] = []
+        with open(path, "r") as file:
+            for line in file:
+                if line.startswith("="):
+                    continue
+                comment_index = line.find("#")
+                if comment_index != -1:
+                    line = line[:comment_index]
+                line = line.strip()
+                if line == "":
+                    continue
+                data_line = {}
+                fields = line.split(",")
+                for field in fields:
+                    key, value = field.split("=")
+                    key = key.strip()
+                    value = value.strip()
+                    data_line[key] = value
+                data.append(data_line)
+
+        # organize the data in a convenient way
+        counts = {
+            (
+                float(data_line["X"][:-len(" deg")]),
+                float(data_line["Y"][:-len(" deg")]),
+            ): CHSHCount(
+                float(data_line["rate1"]),
+                float(data_line["rate2"]),
+                int(data_line["coincidences"]),
+                int(data_line["corrected"]),
+            )
+            for data_line in data
+        }
+        return cls(counts)
