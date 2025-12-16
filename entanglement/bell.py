@@ -59,7 +59,7 @@ def run_bell(sign: Sign, path: str):
     alpha_1 = 0 * circle
     alpha_2 = 1/8 * circle
     beta_1 = 1/16 * circle
-    beta_2 = (1/16 + 1/8) * circle
+    beta_2 = beta_1 + 1/8 * circle
 
     s = s_corr(sign, counts, alpha_1, alpha_2, beta_1, beta_2)
     s_err = s_corr_err(counts, alpha_1, alpha_2, beta_1, beta_2)
