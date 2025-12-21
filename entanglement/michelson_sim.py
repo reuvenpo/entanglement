@@ -1,40 +1,64 @@
 import numpy as np
-from numpy.typing import ndarray, float64, Any, dtype
-from plot import Plot
+# from numpy.typing import ndarray, float64, Any, dtype
+from .plot import Plot
 
 # Constants
 
 C = 3e8  # speed of light
-
+temporal_coherence = True
 # Spatial Coordinates - Wedge width
-d = np.linespace(4e-4, 8e-4, 5000)
+d = np.linspace(4e-4, 6e-4, 500)
 
 # Spectrum Parameters
 # 810 nm
 LAMBDA_0 = 810e-9
+LAMBDA_1 = 610e-9
 bandwidth = 5e-9  #
-n_lambda = 11  # Number of waves, keep odd values to get symmetrical dist around LAMBDA_0
+n_lambda = 3  # Number of waves, keep odd values to get symmetrical dist around LAMBDA_0
 
-lambdas = np.linespace(
+lambdas0 = np.linspace(
     LAMBDA_0 - 3 * bandwidth,
     LAMBDA_0 + 3 * bandwidth,
     n_lambda
 )
+
+lambdas1 = np.linspace(
+    LAMBDA_1 - 3 * bandwidth,
+    LAMBDA_1 + 3 * bandwidth,
+    n_lambda
+)
+
+lambdas = np.append(lambdas0, lambdas1)
 
 # Add weights to the different lambdas,
 # assume Gaussian dist around central wavelength decay
 # can also use Lorentzian for spectroscopy
 # (keep as free parameters for scipy fit)
 
-spectral_weights = np.exp(
-    -0.5 * ((lambdas - LAMBDA_0) / bandwidth) ** 2
+spectral_weights_0 = np.exp(
+    -0.5 * ((lambdas0 - LAMBDA_0) / bandwidth) ** 2
 )
+spectral_weights_1 = np.exp(
+    -0.5 * ((lambdas1 - LAMBDA_1) / bandwidth) ** 2
+)
+
+spectral_weights = np.append(spectral_weights_0, spectral_weights_1)
 # Normalize
 spectral_weights /= spectral_weights.sum()
 
-# TO DO - ADD TIME COHERENCE
-t = np.array([0.0])
-
+# TIME COHERENCE
+if temporal_coherence:
+    # coherence_time = LAMBDA_0 ** 2 / (C * bandwidth)
+    # t = np.linspace(
+    #     -10 * coherence_time,
+    #     10 * coherence_time,
+    #     500
+    # )
+    # 100 ms integration time, 30 ns samples -> 100e-4/30e-9
+    step = np.rint(100e-6 / 30e-9).astype(int)
+    t = np.linspace(0, 100e-6, step)
+else:
+    t = np.array([0.0])
 # Beams and Polarization
 
 E_in = np.array([1.0, 0.0])
@@ -81,7 +105,7 @@ def electric_field_with_time_coherence():
     return E_total_time
 
 
-def calc_electric_field(time: tuple[int, Any]) -> ndarray[tuple[int, int], dtype[float64]]:
+def calc_electric_field(time):
     E_total = np.zeros((2, d.size))
 
     for lam, w in zip(lambdas, spectral_weights):
@@ -106,7 +130,7 @@ def calc_electric_field(time: tuple[int, Any]) -> ndarray[tuple[int, int], dtype
     return E_total
 
 
-def intensity_average(E_total_time: ndarray):
+def intensity_average(E_total_time):
     """
     Expects E_total_time to be a 3d numpy array.
     E_total_time = [time,2,d]
@@ -118,11 +142,11 @@ def intensity_average(E_total_time: ndarray):
     )
 
 
-def plot(d, E_tot):
+def plot(d, I):
     plt = Plot(
         f"Michelson-Sim - {n_lambda} waves around {LAMBDA_0}",
         "wedge width [m]",
         "Intensity average"
     )
-    plt.plot("", d, E_tot)
-    plt.save(f"../output/Michelson-Sim - {n_lambda} waves around {LAMBDA_0}.png")
+    plt.plot("", d, I)
+    plt.save(f"./output/Michelson-Sim - {n_lambda} waves around {LAMBDA_0}.png")
