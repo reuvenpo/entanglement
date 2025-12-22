@@ -17,11 +17,11 @@ d = np.linspace(3e-4, 8e-4, 1000)
 LAMBDA_0 = 810e-9
 # LAMBDA_1 = 790e-9
 bandwidth = 5e-9  #
-n_lambda = 5  # Number of waves, keep odd values to get symmetrical dist around LAMBDA_0
+n_lambda = 4  # Number of waves, keep odd values to get symmetrical dist around LAMBDA_0
 
 lambdas0 = np.linspace(
-    LAMBDA_0 - 4 * bandwidth,
-    LAMBDA_0 + 4 * bandwidth,
+    LAMBDA_0 - 6 * bandwidth,
+    LAMBDA_0 + 6 * bandwidth,
     n_lambda
 )
 

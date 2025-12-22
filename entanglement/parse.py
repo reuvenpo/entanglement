@@ -134,3 +134,49 @@ class CHSH:
             for data_line in data
         }
         return cls(counts)
+
+@dataclass
+class Linear_Scan:
+    """Parses `LinearScan` files from quED"""
+    positions: NDFloat64Array
+    """Position in milimeters"""
+    ch0:NDFloat64Array
+    ch1:NDFloat64Array
+    ch2:NDFloat64Array
+    ch01:NDFloat64Array
+    ch02:NDFloat64Array
+    ch12:NDFloat64Array
+    ch012:NDFloat64Array
+
+    @classmethod
+    def from_file(cls, path: str):
+        # collect all the data from the file:
+        data = np.array()
+        with open(path, "r") as file:
+            for line in file:
+                if line.startswith("="):
+                    continue
+                comment_index = line.find("#")
+                if comment_index != -1:
+                    line = line[:comment_index]
+                line = line.strip()
+                if line == "":
+                    continue
+                fields = line.split("  ")
+                values = [float(str) for str in fields]
+                data.append(values)
+
+        data.T
+        positions = data[0]
+        ch0 = data[1]
+        ch1 = data[2]
+        ch2 = data[3]
+        ch01 = data[5]
+        ch02 = data[6]
+        ch12 = data[7]
+        ch012 = data[11]
+
+
+        # organize the data in a convenient way
+
+        return cls(positions, ch0, ch1, ch2, ch01, ch02, ch12, ch012)
