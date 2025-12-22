@@ -21,8 +21,9 @@ def main():
     # run_bell(Sign.Plus, "data/bell/CHSHmeasurement_01.txt")
     # run_bell(Sign.Minus, "data/bell/CHSHmeasurement_02.txt")
 
-    E = sim.electric_field_with_time_coherence()
-    I = sim.intensity_average(E)
+    I = sim.calc_electric_field()
+    # I = sim.intensity_average(E)
+    counts = sim.model_counts(I)
     sim.plot(sim.d, I)
 
 
