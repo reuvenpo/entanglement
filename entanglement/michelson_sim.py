@@ -10,18 +10,18 @@ A1 = 0.5
 A2 = 0.5
 
 # Spatial Coordinates - Wedge width
-d = np.linspace(4e-4, 6e-4, 500)
+d = np.linspace(3e-4, 8e-4, 1000)
 
 # Spectrum Parameters
 # 810 nm
 LAMBDA_0 = 810e-9
-# LAMBDA_1 = 610e-9
+# LAMBDA_1 = 790e-9
 bandwidth = 5e-9  #
-n_lambda = 1  # Number of waves, keep odd values to get symmetrical dist around LAMBDA_0
+n_lambda = 5  # Number of waves, keep odd values to get symmetrical dist around LAMBDA_0
 
 lambdas0 = np.linspace(
-    LAMBDA_0 - 3 * bandwidth,
-    LAMBDA_0 + 3 * bandwidth,
+    LAMBDA_0 - 4 * bandwidth,
+    LAMBDA_0 + 4 * bandwidth,
     n_lambda
 )
 
@@ -30,7 +30,7 @@ lambdas0 = np.linspace(
 #     LAMBDA_1 + 3 * bandwidth,
 #     n_lambda
 # )
-
+#
 # lambdas = np.append(lambdas0, lambdas1)
 lambdas = lambdas0
 
@@ -39,10 +39,10 @@ lambdas = lambdas0
 # can also use Lorentzian for spectroscopy
 # (keep as free parameters for scipy fit)
 
-spectral_weights_0 = np.exp(
-    -0.5 * ((lambdas0 - LAMBDA_0) / bandwidth) ** 2
-)
-
+# spectral_weights_0 = np.exp(
+#     -0.5 * ((lambdas0 - LAMBDA_0) / 300*bandwidth) ** 2
+# )
+spectral_weights_0 = np.ones(lambdas.size)
 # spectral_weights_1 = np.exp(
 #     -0.5 * ((lambdas1 - LAMBDA_1) / bandwidth) ** 2
 # )
@@ -56,7 +56,7 @@ spectral_weights /= spectral_weights.sum()
 
 # Beams and Polarization
 
-E_in = np.array([1.0, 0.0])
+E_in = np.array([1.0, 0.0], dtype=complex)
 
 
 # Using polarization matrix instead of Malus's Law to pass field as Malus's law discusses the intensity
@@ -70,7 +70,7 @@ def polarizer_matrix(theta):
 # All polarizers are the same as the incoming wave - no polarizers
 # To add - dynamic polarizers
 P1 = polarizer_matrix(0)
-P2 = polarizer_matrix(0)
+P2 = polarizer_matrix(np.pi/4)
 P_out = polarizer_matrix(0)
 
 
@@ -92,8 +92,8 @@ def phi(d, k=12345.67901235):
 
 
 def calc_electric_field():
-    E_total = np.zeros((2, d.size))
-    I = np.zeros((d.size))
+    E_total = np.zeros((2, d.size), dtype=complex)
+
     for lam, w in zip(lambdas, spectral_weights):
         k = 2 * np.pi / lam
 
@@ -104,13 +104,13 @@ def calc_electric_field():
         E1 = E1[:, None]
         # Arm 2 - extra phase
         E2 = A2 * (P2 @ E_in)
-        E2 = E2[:, None] * np.cos(phi(d, k))
+        E2 = E2[:, None] * np.exp(1j*(-phi(d, k)))
         # Arm 3 - out
         E_out = P_out @ (E1 + E2)
 
-        I_lambda = np.sum(E_out ** 2, axis=0)
+        E_total += E_out
 
-        I += w*I_lambda
+    I = np.sum(np.real(E_total) ** 2, axis=0)
     return I
 
 
