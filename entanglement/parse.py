@@ -151,7 +151,7 @@ class Linear_Scan:
     @classmethod
     def from_file(cls, path: str):
         # collect all the data from the file:
-        data = np.array()
+        data = []
         with open(path, "r") as file:
             for line in file:
                 if line.startswith("="):
@@ -165,8 +165,7 @@ class Linear_Scan:
                 fields = line.split("  ")
                 values = [float(str) for str in fields]
                 data.append(values)
-
-        data.T
+        data = np.array(data, dtype=np.float64).T
         positions = data[0]
         ch0 = data[1]
         ch1 = data[2]

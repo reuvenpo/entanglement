@@ -8,6 +8,7 @@ from entanglement.util import Sign
 from entanglement.correlation import run_visibility
 from entanglement.michelson import run_michelson
 from entanglement.bell import run_bell
+from entanglement.HOM import run_HOM
 import entanglement.michelson_sim as sim
 
 def main():
@@ -21,11 +22,13 @@ def main():
     # run_bell(Sign.Plus, "data/bell/CHSHmeasurement_01.txt")
     # run_bell(Sign.Minus, "data/bell/CHSHmeasurement_02.txt")
 
-    I = sim.calc_electric_field()
-    # I = sim.intensity_average(E)
-    counts = sim.model_counts(I)
-    sim.plot(sim.d, I)
+    # Michelson Sim
+    # I = sim.calc_electric_field()
+    # # I = sim.intensity_average(E)
+    # counts = sim.model_counts(I)
+    # sim.plot(sim.d, I)
 
+    run_HOM("data/HOM/HOM_data.txt", "output/HOM.png")
 
 if __name__ == '__main__':
     main()
