@@ -10,18 +10,18 @@ A1 = 0.5
 A2 = 0.5
 
 # Spatial Coordinates - Wedge width
-d = np.linspace(3e-4, 8e-4, 1000)
+d = np.linspace(-1e-4, 1e-4, 1000)
 
 # Spectrum Parameters
 # 810 nm
 LAMBDA_0 = 810e-9
 # LAMBDA_1 = 790e-9
 bandwidth = 5e-9  #
-n_lambda = 4  # Number of waves, keep odd values to get symmetrical dist around LAMBDA_0
+n_lambda = 2  # Number of waves, keep odd values to get symmetrical dist around LAMBDA_0
 
 lambdas0 = np.linspace(
-    LAMBDA_0 - 6 * bandwidth,
-    LAMBDA_0 + 6 * bandwidth,
+    LAMBDA_0 - 10 * bandwidth,
+    LAMBDA_0 + 10 * bandwidth,
     n_lambda
 )
 
@@ -70,14 +70,13 @@ def polarizer_matrix(theta):
 # All polarizers are the same as the incoming wave - no polarizers
 # To add - dynamic polarizers
 P1 = polarizer_matrix(0)
-P2 = polarizer_matrix(np.pi/4)
+P2 = polarizer_matrix(0)
 P_out = polarizer_matrix(0)
 
 
 # Phase Delay
-def phi(d, k=12345.67901235):
-    """
-    Phase delay due to wedge/refraction.
+def phi(d, k=2*np.pi/810e-9):
+    """Phase delay due to wedge/refraction.
     Assumed identical for all wavelengths.
     Using n~1.51
     Set k for 810nm -> k=1/810nm

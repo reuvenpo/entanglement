@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 from entanglement.util import Sign
 from entanglement.correlation import run_visibility
-from entanglement.michelson import run_michelson
+from entanglement.michelson import run_michelson, michelson_from_motorized
 from entanglement.bell import run_bell
 from entanglement.HOM import run_HOM
 import entanglement.michelson_sim as sim
@@ -28,7 +28,8 @@ def main():
     # counts = sim.model_counts(I)
     # sim.plot(sim.d, I)
 
-    run_HOM("data/HOM/HOM_data.txt", "output/HOM.png")
+    # run_HOM("data/HOM/HOM_data.txt", "output/HOM.png")
+    michelson_from_motorized("./data/michelson")
 
 if __name__ == '__main__':
     main()

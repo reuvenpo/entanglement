@@ -1,11 +1,10 @@
 import os.path
-
+from pathlib import Path
 import numpy as np
 import scipy.fft
 
 from . import parse
 from . import plot
-
 
 WEDGE_ALPHA = np.arctan2(0.44, 25)
 
@@ -18,9 +17,9 @@ def run_michelson(folder: str, i_start: int, i_end: int, d0: float, dx: float):
         file_name = os.path.join(folder, f"quCNT_{i:02,}.txt")
         counts = parse.Counts.from_file(file_name)
         count = np.average(counts.count)
-        count_err = np.std(counts.count) #/ counts.count.size ** (1/2)
+        count_err = np.std(counts.count)  # / counts.count.size ** (1/2)
 
-        x.append(d0 + (i - i_start)*dx)
+        x.append(d0 + (i - i_start) * dx)
         y.append(count)
         y_err.append(count_err)
 
@@ -33,12 +32,12 @@ def run_michelson(folder: str, i_start: int, i_end: int, d0: float, dx: float):
     fft = scipy.fft.fft(y)
     fft_freqs = scipy.fftpack.fftfreq(len(y), np.abs(dx))
     frac = 4
-    fft[N//2-N//frac:N//2+N//frac] = 0
+    fft[N // 2 - N // frac:N // 2 + N // frac] = 0
     # print(fft)
     # fft[0] = 0
 
-    plot_fft_freqs = fft_freqs#[:N//2]
-    plot_fft = 2/len(y) * fft#[:N//2]
+    plot_fft_freqs = fft_freqs  # [:N//2]
+    plot_fft = 2 / len(y) * fft  # [:N//2]
     # print(np.abs(plot_fft))
     # print(plot_fft_freqs)
 
@@ -62,3 +61,12 @@ def run_michelson(folder: str, i_start: int, i_end: int, d0: float, dx: float):
     # p.plot_err("counts", x, y, y_err, "o")
     p.save("output/michelson interference recreation.png")
 
+
+def michelson_from_motorized(path: str):
+    files = list(Path(path).glob('*.txt'))
+    for file in files:
+        name = file.name
+        data = parse.Linear_Scan.from_file(file)
+        p = plot.Plot(name, "wedge position [mm]", "single photon counts")
+        p.plot("counts", data.positions, data.ch1, "-")
+        p.save(f"output/{name}.png")
