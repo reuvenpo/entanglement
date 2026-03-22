@@ -1,5 +1,7 @@
 from enum import IntEnum
 
+import numpy as np
+
 
 def perp(deg):
     """The perpendicular of an angle given in degrees"""
@@ -17,3 +19,15 @@ def phi_name(sign: Sign):
     if sign is Sign.Plus:
         return "Φ+"
     return "?"
+
+
+def phi_name_latex(sign: Sign):
+    if sign is Sign.Minus:
+        return r"$\Phi^-$"
+    if sign is Sign.Plus:
+        return r"$\Phi^+$"
+    return "?"
+
+
+def rad_to_deg(rad):
+    return rad * 180 / np.pi

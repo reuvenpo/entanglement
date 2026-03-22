@@ -8,7 +8,7 @@ from .typing import NDFloat64Array
 from . import parse
 from . import plot
 from . import statistics
-from .util import Sign, phi_name
+from .util import Sign, phi_name, phi_name_latex, rad_to_deg
 
 
 def visibility_estimate(c_min, c_max):
@@ -84,17 +84,18 @@ def find_v(corr: parse.Correlation, file_name: str, sign: Sign):
         )
     print()
 
-    p = plot.Plot(f"Visibility fit for {phi_name(sign)}", "Polarizer 2 angle (beta) [deg]", "Coincidence count")
-    p.plot_err("alpha=0°", corr.beta, corr.alpha_0, corr.alpha_0**(1/2))
-    p.plot_err("alpha=45°", corr.beta, corr.alpha_45, corr.alpha_45**(1/2))
-    p.plot_err("alpha=90°", corr.beta, corr.alpha_90, corr.alpha_90**(1/2))
-    p.plot_err("alpha=135°", corr.beta, corr.alpha_135, corr.alpha_135**(1/2))
+    p = plot.Plot(f"Visibility fit for {phi_name_latex(sign)}", r"$\beta\ [ \degree ]$", "Coincidence count")
+    p.plot_err(r"$\alpha = 0 \degree$", rad_to_deg(corr.beta), corr.alpha_0, corr.alpha_0**(1/2))
+    p.plot_err(r"$\alpha = 45 \degree$", rad_to_deg(corr.beta), corr.alpha_45, corr.alpha_45**(1/2))
+    p.plot_err(r"$\alpha = 90 \degree$", rad_to_deg(corr.beta), corr.alpha_90, corr.alpha_90**(1/2))
+    p.plot_err(r"$\alpha = 135 \degree$", rad_to_deg(corr.beta), corr.alpha_135, corr.alpha_135**(1/2))
     fit_beta = np.linspace(corr.beta.min(), corr.beta.max())
-    p.plot("fit alpha=0°", fit_beta, visibility_fit(fit_beta, *alpha_0_fit_params), style="-")
-    p.plot("fit alpha=45°", fit_beta, visibility_fit(fit_beta, *alpha_45_fit_params), style="-")
-    p.plot("fit alpha=90°", fit_beta, visibility_fit(fit_beta, *alpha_90_fit_params), style="-")
-    p.plot("fit alpha=135°", fit_beta, visibility_fit(fit_beta, *alpha_135_fit_params), style="-")
-    p.ax.set_xticks(np.linspace(0, np.pi, 5), ["0", "π/4", "π/2", "3π/4", "π"])
+    p.plot(r"fit $\alpha = 0 \degree$", rad_to_deg(fit_beta), visibility_fit(fit_beta, *alpha_0_fit_params), style="-")
+    p.plot(r"fit $\alpha = 45 \degree$", rad_to_deg(fit_beta), visibility_fit(fit_beta, *alpha_45_fit_params), style="-")
+    p.plot(r"fit $\alpha = 90 \degree$", rad_to_deg(fit_beta), visibility_fit(fit_beta, *alpha_90_fit_params), style="-")
+    p.plot(r"fit $\alpha = 135 \degree$", rad_to_deg(fit_beta), visibility_fit(fit_beta, *alpha_135_fit_params), style="-")
+    ticks = np.linspace(0, 180, 5)
+    p.ax.set_xticks(ticks, (str(int(t)) for t in ticks))
     p.save(f"output/visibility fit for {phi_name(sign)}.png")
 
 
@@ -145,7 +146,7 @@ def fit_entangled_coincidence_phi_at_alpha(alpha: float, beta: NDFloat64Array, c
 
 
 def check_compatibility_with_entanglement(corr: parse.Correlation, file_name: str, sign: Sign):
-    p = plot.Plot(f"cos squared fit for {phi_name(sign)} with free alpha", "Polarizer 2 angle (beta) [deg]", "Coincidence count")
+    p = plot.Plot(f"cos squared fit for {phi_name_latex(sign)} with free alpha", r"$\beta\ [ \degree ]$", "Coincidence count")
     fit_beta = np.linspace(corr.beta.min(), corr.beta.max())
 
     print(f"cos squared fit for {phi_name(sign)} with free alpha")
@@ -160,8 +161,8 @@ def check_compatibility_with_entanglement(corr: parse.Correlation, file_name: st
         alpha_err, amp_err, noise_err = errs
 
         alpha_deg = alpha*180/np.pi
-        p.plot(f"alpha={alpha_deg:.4}°", corr.beta, correlation)
-        p.plot(f"fit alpha={alpha_deg:.4}°", fit_beta, entangled_coincidence_phi(fit_beta, alpha, amp, noise, sign=sign), "-")
+        p.plot(fr"$\alpha={alpha_deg:.3g}\degree$", corr.beta, correlation)
+        p.plot(fr"fit $\alpha={alpha_deg:.3g}\degree$", fit_beta, entangled_coincidence_phi(fit_beta, alpha, amp, noise, sign=sign), "-")
 
         alpha_deg_err = alpha_err * 180 / np.pi
         # noise_ratio = noise/amp
@@ -175,14 +176,14 @@ def check_compatibility_with_entanglement(corr: parse.Correlation, file_name: st
             # f"noise_ratio: {noise_ratio:.2%} ± {noise_ratio_err:.2%} ({noise_ratio_err/noise_ratio:.2%}), "  # related to visibility
             f"chi2_red: {chi_2_red:.3}, "
         )
-    p.ax.set_xticks(np.linspace(0, np.pi, 5), ["0", "π/4", "π/2", "3π/4", "π"])
+    p.ax.set_xticks(np.linspace(0, np.pi, 5), ["0", "45", "90", "135", "180"])
     p.save(f"output/cos squared fit for {phi_name(sign)} with free alpha.png")
 
     print()
 
 
 def check_compatibility_with_entanglement_at_alphas(corr: parse.Correlation, file_name: str, sign: Sign):
-    p = plot.Plot(f"cos squared fit for {phi_name(sign)} with preset alpha", "Polarizer 2 angle (beta) [deg]", "Coincidence count")
+    p = plot.Plot(f"cos squared fit for {phi_name_latex(sign)} with preset alpha", r"$\beta\ [ \degree ]$", "Coincidence count")
     fit_beta = np.linspace(corr.beta.min(), corr.beta.max())
 
     print(f"cos squared fit for {phi_name(sign)} with preset alpha")
@@ -197,8 +198,8 @@ def check_compatibility_with_entanglement_at_alphas(corr: parse.Correlation, fil
         amp, noise = params
         # amp_err, noise_err = errs
 
-        p.plot(f"alpha={i * 45}°", corr.beta, correlation)
-        p.plot(f"fit alpha={i * 45}°", fit_beta, entangled_coincidence_phi(fit_beta, expected_alpha, amp, noise, sign=sign), "-")
+        p.plot(fr"$\alpha = {i * 45}\degree$", corr.beta, correlation)
+        p.plot(fr"fit $\alpha={i * 45}\degree$", fit_beta, entangled_coincidence_phi(fit_beta, expected_alpha, amp, noise, sign=sign), "-")
 
         # noise_ratio = noise/amp
         # noise_ratio_err = noise_ratio * ((noise_err/noise)**2 + (amp_err/amp)**2)**(1/2)
@@ -209,7 +210,7 @@ def check_compatibility_with_entanglement_at_alphas(corr: parse.Correlation, fil
             # f"noise_ratio: {noise_ratio:.2%} ± {noise_ratio_err:.2%} ({noise_ratio_err/noise_ratio:.2%}), "  # related to visibility
             f"chi2_red: {chi_2_red:.4}, "
         )
-    p.ax.set_xticks(np.linspace(0, np.pi, 5), ["0", "π/4", "π/2", "3π/4", "π"])
+    p.ax.set_xticks(np.linspace(0, np.pi, 5), ["0", "45", "90", "135", "180"])
     p.save(f"output/cos squared fit for {phi_name(sign)} with preset alpha.png")
 
     print()
