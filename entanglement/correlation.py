@@ -57,22 +57,19 @@ def visibility_from_fit(beta: NDFloat64Array, coincidence: NDFloat64Array):
 
 def find_v(corr: parse.Correlation, file_name: str, sign: Sign):
     v_estimates = []
-    for x in [corr.alpha_0, corr.alpha_45, corr.alpha_90, corr.alpha_135]:
-        v_estimate = visibility_estimate(x.min(), x.max())
-        v_estimate_err = visibility_estimate_err(x.min(), x.max())
+    curve_params = []
+    corr_counts = [corr.alpha_0, corr.alpha_45, corr.alpha_90, corr.alpha_135]
+    for corr_count in corr_counts:
+        v_estimate = visibility_estimate(corr_count.min(), corr_count.max())
+        v_estimate_err = visibility_estimate_err(corr_count.min(), corr_count.max())
         v_estimates.append((v_estimate, v_estimate_err))
 
-    alpha_0_fit_params, alpha_0_fit_errs = visibility_from_fit(corr.beta, corr.alpha_0)
-    alpha_45_fit_params, alpha_45_fit_errs = visibility_from_fit(corr.beta, corr.alpha_45)
-    alpha_90_fit_params, alpha_90_fit_errs = visibility_from_fit(corr.beta, corr.alpha_90)
-    alpha_135_fit_params, alpha_135_fit_errs = visibility_from_fit(corr.beta, corr.alpha_135)
-    fit_params = [alpha_0_fit_params, alpha_45_fit_params, alpha_90_fit_params, alpha_135_fit_params]
-    fit_errs = [alpha_0_fit_errs, alpha_45_fit_errs, alpha_90_fit_errs, alpha_135_fit_errs]
+        curve_params.append(visibility_from_fit(corr.beta, corr_count))
 
     print(f"Visibility fit for {phi_name(sign)}")
-    for i in range(4):
-        a, beta_c, v_fit, p = fit_params[i]
-        a_err, beta_c_err, v_fit_err, p_err = fit_errs[i]
+    for i, (fit_params, fit_errs) in enumerate(curve_params):
+        a, beta_c, v_fit, p = fit_params
+        a_err, beta_c_err, v_fit_err, p_err = fit_errs
         v_fit_rel_err = v_fit_err / v_fit
         v_estimate, v_estimate_err = v_estimates[i]
         v_estimate_rel_err = v_estimate_err / v_estimate
@@ -85,15 +82,12 @@ def find_v(corr: parse.Correlation, file_name: str, sign: Sign):
     print()
 
     p = plot.Plot(f"Visibility fit for {phi_name_latex(sign)}", r"$\beta\ [ \degree ]$", "Coincidence count")
-    p.plot_err(r"$\alpha = 0 \degree$", rad_to_deg(corr.beta), corr.alpha_0, corr.alpha_0**(1/2))
-    p.plot_err(r"$\alpha = 45 \degree$", rad_to_deg(corr.beta), corr.alpha_45, corr.alpha_45**(1/2))
-    p.plot_err(r"$\alpha = 90 \degree$", rad_to_deg(corr.beta), corr.alpha_90, corr.alpha_90**(1/2))
-    p.plot_err(r"$\alpha = 135 \degree$", rad_to_deg(corr.beta), corr.alpha_135, corr.alpha_135**(1/2))
+    for i, corr_count in enumerate(corr_counts):
+        p.plot_err(fr"$\alpha = {45*i} \degree$", rad_to_deg(corr.beta), corr_count, corr_count ** (1 / 2))
     fit_beta = np.linspace(corr.beta.min(), corr.beta.max())
-    p.plot(r"fit $\alpha = 0 \degree$", rad_to_deg(fit_beta), visibility_fit(fit_beta, *alpha_0_fit_params), style="-")
-    p.plot(r"fit $\alpha = 45 \degree$", rad_to_deg(fit_beta), visibility_fit(fit_beta, *alpha_45_fit_params), style="-")
-    p.plot(r"fit $\alpha = 90 \degree$", rad_to_deg(fit_beta), visibility_fit(fit_beta, *alpha_90_fit_params), style="-")
-    p.plot(r"fit $\alpha = 135 \degree$", rad_to_deg(fit_beta), visibility_fit(fit_beta, *alpha_135_fit_params), style="-")
+    for i, (fit_params, _fit_errs) in enumerate(curve_params):
+        p.plot(fr"fit $\alpha = {45*i} \degree$", rad_to_deg(fit_beta), visibility_fit(fit_beta, *fit_params), style="-")
+
     ticks = np.linspace(0, 180, 5)
     p.ax.set_xticks(ticks, (str(int(t)) for t in ticks))
     p.save(f"output/visibility fit for {phi_name(sign)}.png")
