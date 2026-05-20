@@ -31,3 +31,8 @@ def phi_name_latex(sign: Sign):
 
 def rad_to_deg(rad):
     return rad * 180 / np.pi
+
+
+def mod_dist(to, from_, mod):
+    """Distance in modulo space. Result in [-mod/2, mod/2]. Sign indicates direction."""
+    return (to - from_ + mod / 2) % mod - mod / 2
