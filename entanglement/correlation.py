@@ -1,6 +1,7 @@
 """This file includes function used in the visibility experiment"""
 import os.path
 
+import matplotlib
 import numpy as np
 import scipy as sp
 
@@ -8,7 +9,7 @@ from .typing import NDFloat64Array
 from . import parse
 from . import plot
 from . import statistics
-from .util import Sign, phi_name, phi_name_latex, rad_to_deg
+from .util import Sign, phi_name, phi_name_latex, rad_to_deg, mod_dist
 
 
 def visibility_estimate(c_min, c_max):
@@ -77,16 +78,20 @@ def find_v(corr: parse.Correlation, file_name: str, sign: Sign):
             f"X={i * 45}°:\t"
             f"fit: {v_fit:.2%} ± {v_fit_err:.2%} ({v_fit_rel_err:.2%}), "
             f"estimate: {v_estimate:.2%} ± {v_estimate_err:.2%} ({v_estimate_rel_err:.1%}), "
-            f"n_sigma: {statistics.nsigma(v_fit, v_fit_err, v_estimate, v_estimate_err):.2}"
+            f"n_sigma: {statistics.nsigma(v_fit, v_fit_err, v_estimate, v_estimate_err):.2}, "
+            f"periodicity: {1/p:.5g} ± {p_err/p**2:.2} ({p_err/p:.2%}) n_sigma={np.abs(0.5-p)/p_err:.2}, "
         )
     print()
 
+    colors = matplotlib.rcParams['axes.prop_cycle'].by_key()['color']
     p = plot.Plot(f"Visibility fit for {phi_name_latex(sign)}", r"$\beta\ [ \degree ]$", "Coincidence count")
     for i, corr_count in enumerate(corr_counts):
-        p.plot_err(fr"$\alpha = {45*i} \degree$", rad_to_deg(corr.beta), corr_count, corr_count ** (1 / 2))
+        p.plot_err(fr"$\alpha = {45*i} \degree$", rad_to_deg(corr.beta), corr_count, corr_count ** (1 / 2), color=colors[i])
     fit_beta = np.linspace(corr.beta.min(), corr.beta.max())
     for i, (fit_params, _fit_errs) in enumerate(curve_params):
-        p.plot(fr"fit $\alpha = {45*i} \degree$", rad_to_deg(fit_beta), visibility_fit(fit_beta, *fit_params), style="-")
+        fit = visibility_fit(fit_beta, *fit_params)
+        p.plot(fr"fit $\alpha = {45*i} \degree$", rad_to_deg(fit_beta), fit, style="-", color=colors[i])
+        p.plot(None, [rad_to_deg(fit_beta)[fit.argmax()]]*2, [0, fit.max()], style="--", color="gray")
 
     ticks = np.linspace(0, 180, 5)
     p.ax.set_xticks(ticks, (str(int(t)) for t in ticks))
@@ -159,12 +164,15 @@ def check_compatibility_with_entanglement(corr: parse.Correlation, file_name: st
         p.plot(fr"fit $\alpha={alpha_deg:.3g}\degree$", fit_beta, entangled_coincidence_phi(fit_beta, alpha, amp, noise, sign=sign), "-")
 
         alpha_deg_err = alpha_err * 180 / np.pi
+        alpha_deg_offset = mod_dist(alpha_deg, i*45, 180)
         # noise_ratio = noise/amp
         # noise_ratio_err = noise_ratio * ((noise_err/noise)**2 + (amp_err/amp)**2)**(1/2)
         print(
             f"X={i * 45}°:\t"
             f"alpha: {alpha_deg:.5}° ± {alpha_deg_err:.2}° ({alpha_deg_err/alpha_deg:.2%}), "
-            f"offset: {(alpha_deg - i*45 + 180/2)%180 - 180/2:.3}°, "  # How many degrees off is the curve's phase?
+            # f"offset: {alpha_deg_offset:.3}°, "  # How many degrees off is the curve's phase?
+            f"offset: {alpha_deg_offset:.4} ± {alpha_deg_err:.2} ({alpha_deg_err/alpha_deg_offset:.2%}), "  # How many degrees off is the curve's phase?
+            f"n_sigma: {np.abs(alpha_deg_offset)/alpha_deg_err:.2g}, "
             # f"amp: {amp:.5} ± {amp_err:.2} ({amp_err/amp:.2%}), "
             # f"noise: {noise:.5} ± {noise_err:.2} ({noise_err/noise:.2%}), "
             # f"noise_ratio: {noise_ratio:.2%} ± {noise_ratio_err:.2%} ({noise_ratio_err/noise_ratio:.2%}), "  # related to visibility
