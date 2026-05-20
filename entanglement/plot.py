@@ -18,27 +18,27 @@ class Plot:
         self.ax = ax
         self.fig = fig
 
-    def plot(self, label, x, y, style="o"):
+    def plot(self, label, x, y, style="o", color=None):
         """A little helper to remind me I can add legend labels."""
-        self.ax.plot(x, y, style, label=label)
+        self.ax.plot(x, y, style, label=label, color=None)
 
-    def plot_err(self, label, x, y, sigma, style="o", linestyle=""):
+    def plot_err(self, label, x, y, sigma, style="o", linestyle="", color=None):
         """A little helper to remind me I can add legend labels."""
-        self.ax.errorbar(x, y, sigma, marker=style, linestyle=linestyle, label=label)
+        self.ax.errorbar(x, y, sigma, marker=style, linestyle=linestyle, label=label, color=None)
 
-    def plot_polyfit(self, label, x, y, degree=1, style="--"):
+    def plot_polyfit(self, label, x, y, degree=1, style="--", color=None):
         """Add a polynomial fit to the graph"""
         fit = npp.Polynomial.fit(x, y, deg=degree)
         fit_y = fit(x)
-        self.ax.plot(x, fit_y, style, label=label)
+        self.ax.plot(x, fit_y, style, label=label, color=None)
 
         return fit, fit_y
 
-    def plot_err_with_fit(self, label, x, y, sigma, fit, style="--"):
+    def plot_err_with_fit(self, label, x, y, sigma, fit, style="--", color=None):
         fit_x = np.linspace(x.min(), x.max())
         fit_y = fit(fit_x)
         self.ax.errorbar(x=x, y=y, yerr=sigma, marker='o', linestyle='')
-        self.ax.plot(fit_x, fit_y, style, label=label)
+        self.ax.plot(fit_x, fit_y, style, label=label, color=None)
 
     def save(self, output_file):
         with catch_warnings():
